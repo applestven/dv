@@ -1,0 +1,20 @@
+src/
+├─ api/
+│  └─ download.routes.js
+├─ queue/
+│  ├─ taskQueue.js        
+│  └─ taskWorker.js
+├─ resolver/
+│  ├─ platformDetect.js
+│  ├─ strategyRouter.js
+│  └─ strategies/
+│     ├─ ytDlp.strategy.js
+│     ├─ ytDlpGeneric.strategy.js
+│     └─ puppeteer.strategy.js
+├─ downloader/
+│  └─ ytDlpRunner.js
+├─ store/
+│  └─ taskStore.js        
+├─ types/
+│  └─ task.js
+└─ app.js

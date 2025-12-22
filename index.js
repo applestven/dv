@@ -1,7 +1,5 @@
-const { downloadVideoCommon } = require('./utils/puppeteer/downloadVideo.js');
+const app = require('./src/app');
 
-async function downloadVideo(url, options = {}) {
-    return await downloadVideoCommon({ sourceUrl: url, options: { ...options } });
-}
-
-downloadVideo("【印度美食超级大变！竟从不明物体变为篮球与鸡！】 https://www.bilibili.com/video/BV1Q4qUBUEhQ/?share_source=copy_web");
+app.listen(3456, () => {
+    console.log('🚀 server running at http://localhost:3456');
+});
