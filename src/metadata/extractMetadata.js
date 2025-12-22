@@ -1,44 +1,7 @@
 const { spawn } = require('child_process');
 const { resolveYtDlpPath } = require('../downloader/ytDlpBinary');
-const { ensureFreshCookie } = require('../cookie/cookieManager');
 
-function runDump({ url, cookiePath }) {
-    return new Promise((resolve, reject) => {
-        const ytDlp = resolveYtDlpPath();
-
-        const args = [
-            '--dump-json',
-            '--no-playlist',
-        ];
-
-        if (cookiePath) {
-            args.push('--cookies', cookiePath);
-        }
-
-        args.push(url);
-
-        const proc = spawn(ytDlp, args, {
-            windowsHide: true,
-            stdio: ['ignore', 'pipe', 'pipe'],
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        proc.stdout.on('data', d => stdout += d);
-        proc.stderr.on('data', d => stderr += d);
-
-        proc.on('close', code => {
-            if (code === 0 && stdout) {
-                resolve(JSON.parse(stdout));
-            } else {
-                reject(new Error(stderr || 'yt-dlp dump failed'));
-            }
-        });
-    });
-}
-
-function extractMetadata({ url, cookiePath, retry = 0 }) {
+function extractMetadata({ url, cookiePath }) {
     return new Promise((resolve) => {
         const ytDlpBin = resolveYtDlpPath();
 
@@ -61,11 +24,11 @@ function extractMetadata({ url, cookiePath, retry = 0 }) {
         let stdout = '';
         let stderr = '';
 
-        proc.stdout.on('data', d => stdout += d);
-        proc.stderr.on('data', d => stderr += d);
+        proc.stdout.on('data', d => stdout += d.toString());
+        proc.stderr.on('data', d => stderr += d.toString());
 
-        proc.on('close', async () => {
-            // ✅ 成功
+        proc.on('close', () => {
+            // ✅ 正常拿到 metadata
             if (stdout.trim().startsWith('{')) {
                 try {
                     const json = JSON.parse(stdout);
@@ -78,25 +41,21 @@ function extractMetadata({ url, cookiePath, retry = 0 }) {
                         raw: json,
                     });
                 } catch {
-                    // fallthrough
+                    // JSON 解析失败，继续走失败逻辑
                 }
             }
 
-            // ❗ Douyin / 风控 / cookie 问题 —— 不抛异常
-            if (
-                stderr.includes('Fresh cookies') ||
-                stderr.includes('Failed to parse JSON')
-            ) {
-                console.warn('[metadata] need fresh cookies for', url, stderr);
+            // ❗ Douyin 登录依赖（明确、可解释的失败）
+            if (stderr.includes('Fresh cookies')) {
                 return resolve({
                     ok: false,
+                    platform: 'douyin',
                     needLogin: true,
-                    reason: 'COOKIE_REQUIRED',
-                    stderr,
+                    reason: 'LOGIN_COOKIE_REQUIRED',
                 });
             }
 
-            // ❗ 其他未知失败
+            // ❗ 其他失败（保留 stderr，方便日志）
             return resolve({
                 ok: false,
                 reason: 'DUMP_FAILED',
@@ -105,7 +64,5 @@ function extractMetadata({ url, cookiePath, retry = 0 }) {
         });
     });
 }
-
-
 
 module.exports = { extractMetadata };

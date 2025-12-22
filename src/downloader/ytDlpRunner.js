@@ -18,7 +18,10 @@ async function runYtDlp(options) {
         timeout = 10 * 60 * 1000,
         extraArgs = [],
         debug = false, // ⭐ 开发 / 生产切换
+        quality
     } = options;
+
+    const suffix = quality ? `-${quality}` : '';
 
     if (!url) {
         throw new Error('yt-dlp: url is required');
@@ -42,6 +45,11 @@ async function runYtDlp(options) {
         args.push('--user-agent', userAgent);
     }
 
+
+    args.push(
+        '-P', outputDir,
+        '-o', `%(title)s${suffix}.%(ext)s`
+    );
     // 业务参数
     args.push(...extraArgs);
 
