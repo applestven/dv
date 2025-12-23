@@ -5,6 +5,7 @@
 // 👉 自动处理 cookies / retry / fallback
 // 👉 自动缓存 metadata
 
+// 弃
 
 const { detectPlatform } = require('../utils/platformDetect');
 const { getPlatformDownloader } = require('./platforms');

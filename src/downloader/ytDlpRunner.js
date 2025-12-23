@@ -4,6 +4,10 @@ const path = require('path');
 const fs = require('fs');
 const { resolveYtDlpPath } = require('./ytDlpBinary');
 
+const { detectPlatform } = require('../utils/platformDetect');
+const { resolveCookieByPlatform } = require('../utils/cookieResolver');
+const { DownloadFallbackError } = require('../errors/DownloadFallbackError');
+
 function resolveFormatByQuality(quality) {
     switch (quality) {
         case 'video_best':
@@ -27,7 +31,7 @@ function runYtDlp({
     url,
     outputDir = path.resolve(process.cwd(), 'downloads'),
     quality = 'video_best',
-    cookies,
+    cookies,           // ⭐ 允许外部强制指定
     userAgent,
     extraArgs = [],
     timeout = 10 * 60 * 1000,
@@ -40,24 +44,36 @@ function runYtDlp({
         fs.mkdirSync(outputDir, { recursive: true });
     }
 
+    // ⭐ 平台识别
+    const platform = detectPlatform(url);
+
+    // ⭐ cookie 解析优先级：手动传入 > 平台 cookie > 无
+    const autoCookie = cookies || resolveCookieByPlatform(platform);
+
     const ytDlpBin = resolveYtDlpPath();
     const format = resolveFormatByQuality(quality);
 
     const args = [
         url,
         '-f', format,
-        '-o', path.join(outputDir, `%(title)s${quality}.%(ext)s`),
+        '-o', path.join(outputDir, `%(title)s-${quality}.%(ext)s`),
         '--no-playlist',
         '--no-part',
     ];
 
-    // 视频模式才合并 mp4
     if (!isAudioMode(quality)) {
         args.push('--merge-output-format', 'mp4');
     }
 
-    if (cookies) args.push('--cookies', cookies);
-    if (userAgent) args.push('--user-agent', userAgent);
+    // ⭐ 自动注入 cookie（如果存在）
+    if (autoCookie) {
+        args.push('--cookies', autoCookie);
+        console.log(`[yt-dlp] using cookie: ${autoCookie}`);
+    }
+
+    if (userAgent) {
+        args.push('--user-agent', userAgent);
+    }
 
     args.push(...extraArgs);
 
@@ -87,7 +103,14 @@ function runYtDlp({
             if (code === 0) {
                 resolve();
             } else {
-                reject(new Error(stderr || `yt-dlp exited with ${code}`));
+                reject(new DownloadFallbackError(
+                    'yt-dlp download failed',
+                    {
+                        raw: stderr || `yt-dlp exited with ${code}`,
+                        platform,
+                        url,
+                    }
+                ));
             }
         });
     });

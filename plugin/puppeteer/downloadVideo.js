@@ -19,7 +19,7 @@ const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './file', re
     // downloadLog.info('⚠️正在重试流程');
     await delay(3000);
   }
-
+  console.log("sourceUrl", sourceUrl)
   sourceUrl = sourceUrl || mockVideoList[2]['西瓜视频'][0];
   if (!sourceUrl) return console.log('sourceUrl不能为空');
 
@@ -201,7 +201,7 @@ const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './file', re
   }
 };
 
-const downloadVideoCommon = async ({ sourceUrl, downloadPath = './file' }) => {
+const downloadVideoCommon = async ({ sourceUrl, downloadPath = './downloads' }) => {
   try {
     const result = await _downloadVideoCommonCore({ sourceUrl, downloadPath });
     return {

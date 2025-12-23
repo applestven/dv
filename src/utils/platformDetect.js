@@ -4,6 +4,8 @@
 function detectPlatform(url) {
     if (/douyin\.com/.test(url)) return 'douyin';
     if (/bilibili\.com/.test(url)) return 'bilibili';
+    if (/kuaishou\.com/.test(url)) return 'kuaishou';
+    if (/youtube\.com|youtu\.be/.test(url)) return 'youtube';
     return 'generic';
 }
 
