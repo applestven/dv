@@ -84,7 +84,7 @@ async function launchBrowser(options = {}) {
 
   const browser = await puppeteer.launch({
     defaultViewport: { width: 1308, height: 906 },
-    // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     timeout: 10800000,
     protocolTimeout: 10800000,
     headless: debug ? false : true,
@@ -99,7 +99,7 @@ async function launchBrowser(options = {}) {
       proxy ? `--proxy-server=${proxy}` : '',
     ],
     // if debug 去掉 executablePath  否则 executablePath：executablePath
-    executablePath: debug ? undefined : executablePath,
+    // executablePath: debug ? undefined : executablePath,
   });
 
   // console.log("输出 Chromium 路径", browser.executablePath); // 输出 Chromium 路径

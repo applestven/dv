@@ -54,12 +54,16 @@ const FORMAT_MAP = {
             '--audio-quality', '0',
         ],
         'video-worst': [
-            '-f', 'worstvideo+bestaudio/worst',
-            '--merge-output-format', 'mp4',
+            '-f',
+            'worstvideo[ext=mp4]+bestaudio[ext=m4a]/worst[ext=mp4]',
+            '--merge-output-format',
+            'mp4',
         ],
         'video-best': [
-            '-f', 'bestvideo+bestaudio/best',
-            '--merge-output-format', 'mp4',
+            '-f',
+            'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]',
+            '--merge-output-format',
+            'mp4',
         ],
     },
 

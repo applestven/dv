@@ -279,3 +279,15 @@ callback(success)  │
    └──── 失败 ────┘
            ↓
      callback(failed)
+
+
+## 抖音专用策略（强烈建议）
+runYtDlp
+  ↓
+Douyin extractor 报 Fresh cookies needed
+  ↓
+调用 douyinCookieProvider（puppeteer）
+  ↓
+生成「新鲜 cookie 文件」
+  ↓
+再次 runYtDlp（携带 cookie）
