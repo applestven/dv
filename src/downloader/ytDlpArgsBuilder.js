@@ -14,86 +14,7 @@
 //   | 'audio-low';  // 低质量音频（快、体积小）
 
 const path = require('path');
-
-function detectPlatform(url = '') {
-    if (/bilibili\.com/.test(url)) return 'bilibili';
-    if (/douyin\.com|v\.douyin\.com/.test(url)) return 'douyin';
-    if (/tiktok\.com/.test(url)) return 'tiktok';
-    if (/youtube\.com|youtu\.be/.test(url)) return 'youtube';
-    return 'generic';
-}
-
-/**
- * 根据 quality + platform 构建 args
- */
-// function buildYtDlpArgs({ url, quality = 'best' }) {
-//     const platform = detectPlatform(url);
-//     const args = [];
-
-//     /* ---------- 音频模式 ---------- */
-//     if (quality === 'audio-best') {
-//         return [
-//             url,
-//             '-x',
-//             '--audio-format', 'mp3',
-//             '--audio-quality', '0', // best
-//         ];
-//     }
-
-//     if (quality === 'audio-low') {
-//         return [
-//             url,
-//             '-x',
-//             '--audio-format', 'mp3',
-//             '--audio-quality', '9', // worst
-//         ];
-//     }
-
-//     /* ---------- 视频最差 ---------- */
-//     if (quality === 'worst') {
-//         if (['bilibili', 'youtube'].includes(platform)) {
-//             args.push('-f', 'worstvideo+worstaudio/worst');
-//         } else {
-//             args.push('-f', 'worst');
-//         }
-//         return [url, ...args];
-//     }
-
-//     /* ---------- 720p ---------- */
-//     if (quality === 'video-720p') {
-//         if (['bilibili', 'youtube'].includes(platform)) {
-//             args.push(
-//                 '-f',
-//                 'bestvideo[height<=720]+bestaudio/best[height<=720]'
-//             );
-//         }
-//         // 抖音 / tiktok：不保证分辨率，交给 yt-dlp
-//         return [url, ...args];
-//     }
-
-//     /* ---------- best（默认） ---------- */
-//     if (['bilibili', 'youtube'].includes(platform)) {
-//         args.push('-f', 'bestvideo+bestaudio/best');
-//     }
-
-//     return [url, ...args];
-// }
-
-// function buildYtDlpArgs({ platform, quality, suffix }) {
-//   const map = {
-//     'audio-low': ['-f', 'worst', '-x', '--audio-format', 'mp3', '--audio-quality', '9'],
-//     'audio-best': ['-x', '--audio-format', 'mp3', '--audio-quality', '0'],
-//     'video-worst': ['-f', 'worst', '--merge-output-format', 'mp4'],
-//     'video-720p': ['-f', 'bv*[height<=720]/bv*+ba/b'],
-//     'video-best': ['-f', 'bv*+ba/b', '--merge-output-format', 'mp4'],
-//   };
-
-//   return [
-//     ...(map[quality] || []),
-//     '-o',
-//     `%(title)s-${suffix}.%(ext)s`,
-//   ];
-// }
+const { detectPlatform } = require('../utils/platformDetect');
 
 const FORMAT_MAP = {
     bilibili: {
@@ -160,6 +81,28 @@ const FORMAT_MAP = {
         ],
     },
 
+    kuaishou: {
+        'audio-low': [
+            '-f', 'bestaudio/best',
+            '-x',
+            '--audio-format', 'mp3',
+            '--audio-quality', '9',
+        ],
+        'audio-best': [
+            '-f', 'bestaudio/best',
+            '-x',
+            '--audio-format', 'mp3',
+            '--audio-quality', '0',
+        ],
+        'video-worst': [
+            // 快手不可靠区分 worst / best，直接兜底
+            '--merge-output-format', 'mp4',
+        ],
+        'video-best': [
+            '--merge-output-format', 'mp4',
+        ],
+    },
+
     generic: {
         'audio-low': [
             '-f', 'bestaudio/best',
@@ -187,7 +130,8 @@ function buildYtDlpArgs({
 }) {
     const platformMap = FORMAT_MAP[platform] || FORMAT_MAP.generic;
     const formatArgs = platformMap[quality] || [];
-
+    console.log("@@匹配到平台platform", platform)
+    console.log("是否匹配到yd的规则", FORMAT_MAP[platform])
     return [
         ...formatArgs,
         '-o',

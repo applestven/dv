@@ -8,6 +8,10 @@ const { detectPlatform } = require('../utils/platformDetect');
 const { resolveCookieByPlatform } = require('../utils/cookieResolver');
 const { DownloadFallbackError } = require('../errors/DownloadFallbackError');
 
+const {
+    buildYtDlpArgs
+} = require('./ytDlpArgsBuilder');
+
 function resolveFormatByQuality(quality) {
     switch (quality) {
         case 'video_best':
@@ -51,15 +55,28 @@ function runYtDlp({
     const autoCookie = cookies || resolveCookieByPlatform(platform);
 
     const ytDlpBin = resolveYtDlpPath();
-    const format = resolveFormatByQuality(quality);
+    // const format = resolveFormatByQuality(quality);
 
+    // const args = [
+    //     url,
+    //     '-f', format,
+    //     '-o', path.join(outputDir, `%(title)s-${quality}.%(ext)s`),
+    //     '--no-playlist',
+    //     '--no-part',
+    // ];
+
+    const ytDlpArgs = buildYtDlpArgs({
+        platform,
+        quality: quality.replace('_', '-'), // video_best → video-best
+        outputDir,
+        suffix: quality,
+    });
     const args = [
         url,
-        '-f', format,
-        '-o', path.join(outputDir, `%(title)s-${quality}.%(ext)s`),
+        ...ytDlpArgs,
         '--no-playlist',
-        '--no-part',
     ];
+
 
     if (!isAudioMode(quality)) {
         args.push('--merge-output-format', 'mp4');
