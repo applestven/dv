@@ -14,7 +14,7 @@ const pipelineAsync = promisify(pipeline);
 // const { store } = require('../store/index.js');
 // const debug = store.get('debug');
 
-const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './file', retry = false }) => {
+const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './', retry = false }) => {
   if (retry) {
     // downloadLog.info('⚠️正在重试流程');
     await delay(3000);
