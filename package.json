@@ -4,7 +4,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dy:cookie": "node ./tools/douyinCookie.js"
+    "dy:cookie": "node ./tools/douyinCookie.js",
+    "db:init": "node init_database.js",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,8 @@
     "puppeteer": "^24.34.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "uuid": "^13.0.0"
+    "uuid": "^13.0.0",
+    "mysql2": "^3.9.7",
+    "dotenv": "^16.4.5"
   }
 }

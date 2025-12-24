@@ -5,10 +5,10 @@ const { submitTask } = require('../queue/taskWorker');
 
 const router = express.Router();
 
-router.post('/download', (req, res) => {
+router.post('/download', async (req, res) => {
   const { url, quality = 'video_bestest' } = req.body;
 
-  const task = createTask({
+  const task = await createTask({
     id: uuid(),
     url,
     quality,
@@ -16,13 +16,14 @@ router.post('/download', (req, res) => {
     createdAt: Date.now(),
   });
 
-  submitTask(task);
+  await submitTask(task);
 
   res.json({ taskId: task.id });
 });
 
-router.get('/task/:id', (req, res) => {
-  res.json(getTask(req.params.id));
+router.get('/task/:id', async (req, res) => {
+  const task = await getTask(req.params.id);
+  res.json(task);
 });
 
 module.exports = router;
