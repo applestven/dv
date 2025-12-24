@@ -7,6 +7,8 @@ const { runPuppeteerDownload } = require('./downloader/runPuppeteerDownload');
 const app = express();
 app.use(express.json());
 
+const path = require('path');
+
 app.post('/download', async (req, res) => {
     const { url, quality = 'video_bestest' } = req.body;
     const id = uuid();
@@ -19,7 +21,12 @@ app.post('/download', async (req, res) => {
     });
 
     runYtDlp({ quality, url, id })
-        .then(() => updateTask(id, { status: 'success', engine: 'yt-dlp', }))
+        .then((outputPath) => {
+            const patch = { status: 'success', engine: 'yt-dlp' };
+            if (outputPath) patch.output = path.join(outputPath);
+            if (outputPath) patch.outputName = path.basename(outputPath);
+            updateTask(id, patch);
+        })
         .catch(async (err) => {
             console.error('[download failed]', err.message);
 
@@ -33,13 +40,15 @@ app.post('/download', async (req, res) => {
                     });
 
                     // 👉 走你已经跑通的 puppeteer 方案
-                    await runPuppeteerDownload(url, {
+                    const outputPath = await runPuppeteerDownload(url, {
                         taskId: id,
                     });
 
                     updateTask(id, {
                         status: 'success',
                         engine: 'puppeteer',
+                        ...(outputPath ? { output: path.join(outputPath), outputName: path.basename(outputPath) } : {}),
+
                     });
 
                 } catch (puppeteerErr) {

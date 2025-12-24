@@ -167,16 +167,17 @@ function runYtDlp({
          * - 或 cookie 文件不存在
          * → 直接用 puppeteer 刷新
          */
-        if (platform === 'douyin') {
-            const cookieInvalid =
-                !autoCookie ||
-                !fs.existsSync(autoCookie);
+        // 目前没跑通 后续再看
+        // if (platform === 'douyin') {
+        //     const cookieInvalid =
+        //         !autoCookie ||
+        //         !fs.existsSync(autoCookie);
 
-            if (cookieInvalid) {
-                console.log('[douyin] refreshing fresh cookies via puppeteer...');
-                autoCookie = await refreshDouyinCookie();
-            }
-        }
+        //     if (cookieInvalid) {
+        //         console.log('[douyin] refreshing fresh cookies via puppeteer...');
+        //         autoCookie = await refreshDouyinCookie();
+        //     }
+        // }
 
         const ytDlpBin = resolveYtDlpPath();
 
@@ -233,6 +234,25 @@ function runYtDlp({
             proc.on('close', code => {
                 clearTimeout(timer);
                 if (code === 0) {
+                    // 查找输出目录中匹配后缀的文件并返回文件路径（优先返回最近修改的）
+                    const suffixToken = quality; // buildYtDlpArgs 中使用的 suffix 是原始 quality
+                    try {
+                        const files = fs.readdirSync(outputDir);
+                        const matched = files.filter(f => f.includes(`-${suffixToken}.`));
+                        if (matched.length > 0) {
+                            matched.sort((a, b) => {
+                                const aStat = fs.statSync(path.join(outputDir, a));
+                                const bStat = fs.statSync(path.join(outputDir, b));
+                                return bStat.mtimeMs - aStat.mtimeMs;
+                            });
+                            const finalFile = path.join(outputDir, matched[0]);
+                            return resolve(finalFile);
+                        }
+                    } catch (err) {
+                        console.warn('[yt-dlp] find output file failed', err.message);
+                    }
+
+                    // 未找到文件时仍然正常 resolve（上层可根据是否存在 output 字段判断）
                     resolve();
                 } else {
                     reject(new DownloadFallbackError(

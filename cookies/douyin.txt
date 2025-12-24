@@ -13,7 +13,7 @@
 .douyin.com	TRUE	/	FALSE	1767104817	stream_recommend_feed_params	%22%7B%5C%22cookie_enabled%5C%22%3Atrue%2C%5C%22screen_width%5C%22%3A2560%2C%5C%22screen_height%5C%22%3A1440%2C%5C%22browser_online%5C%22%3Atrue%2C%5C%22cpu_core_num%5C%22%3A4%2C%5C%22device_memory%5C%22%3A8%2C%5C%22downlink%5C%22%3A10%2C%5C%22effective_type%5C%22%3A%5C%224g%5C%22%2C%5C%22round_trip_time%5C%22%3A100%7D%22
 .douyin.com	TRUE	/	TRUE	1797604878	ttwid	1%7CGKGU7a5v1YK3kvQzkPC4UNi-Ufr4ewuWdVBsdKrnIOU%7C1766500018%7C93d9eedf212a7f048b816a0ea89c501c1eca6f7517c271cb102e31d827b81a9a
 .douyin.com	TRUE	/	FALSE	1767104818	volume_info	%7B%22isUserMute%22%3Afalse%2C%22isMute%22%3Afalse%2C%22volume%22%3A0.5%7D
-.iesdouyin.com	TRUE	/	FALSE	1797605882	ttwid	1%7CVhcZgPzEtiL07HTos-wLIrULWyUJ75nCRRb_XWF82hk%7C1766500032%7C4a0244bdc0ff1d955defca69b5574a8b4c1135fc3e4e2d6f34b20614da6261ec
+.iesdouyin.com	TRUE	/	FALSE	1797647837	ttwid	1%7CVhcZgPzEtiL07HTos-wLIrULWyUJ75nCRRb_XWF82hk%7C1766500032%7C4a0244bdc0ff1d955defca69b5574a8b4c1135fc3e4e2d6f34b20614da6261ec
 .www.douyin.com	TRUE	/	TRUE	1798036015	__ac_signature	_02B4Z6wo00f01yfoztQAAIDClghwzuTBZHcn2MpAAKC6c8
 .www.douyin.com	TRUE	/	FALSE	1769092007	device_web_cpu_core	4
 .www.douyin.com	TRUE	/	FALSE	1769092007	device_web_memory_size	8
@@ -22,3 +22,4 @@
 .www.douyin.com	TRUE	/	FALSE	1767104817	dy_swidth	2560
 .www.douyin.com	TRUE	/	FALSE	1771684017	s_v_web_id	verify_mjioi0v8_opnyW2Fw_Ycpw_4DkX_9ITT_bLocmprb4L4W
 .www.douyin.com	TRUE	/	FALSE	1769092007	x-web-secsdk-uid	3c83d01b-9258-47f3-b6ae-5df38a72d845
+www.douyin.com	FALSE	/	FALSE	1766544959	__ac_nonce	0694b4f37000924b7761e
