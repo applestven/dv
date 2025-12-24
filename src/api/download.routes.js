@@ -1,23 +1,28 @@
-// api/download.routes.js
+const express = require('express');
 const { v4: uuid } = require('uuid');
 const { createTask, getTask } = require('../store/taskStore');
 const { submitTask } = require('../queue/taskWorker');
 
-app.post('/download', (req, res) => {
-    const { url } = req.body;
+const router = express.Router();
 
-    const task = createTask({
-        id: uuid(),
-        url,
-        status: 'pending',
-        createdAt: Date.now(),
-    });
+router.post('/download', (req, res) => {
+  const { url, quality = 'video_bestest' } = req.body;
 
-    submitTask(task, strategies);
+  const task = createTask({
+    id: uuid(),
+    url,
+    quality,
+    status: 'pending',
+    createdAt: Date.now(),
+  });
 
-    res.json({ taskId: task.id });
+  submitTask(task);
+
+  res.json({ taskId: task.id });
 });
 
-app.get('/task/:id', (req, res) => {
-    res.json(getTask(req.params.id));
+router.get('/task/:id', (req, res) => {
+  res.json(getTask(req.params.id));
 });
+
+module.exports = router;

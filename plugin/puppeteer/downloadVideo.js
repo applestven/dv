@@ -67,7 +67,7 @@ const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './', retry 
 
       let result = await downloadArray({
         videoUrlList: downloadUrl,
-        downloadPath: path.join(downloadPath, './file'),
+        downloadPath: path.join(downloadPath, './'),
       });
 
       if (result.length === 2) {
@@ -84,7 +84,7 @@ const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './', retry 
         // downloadLog.info('正在进行转码 h264');
         let finallyPath = await reEncodeH264Video(
           outPath,
-          path.join(downloadPath, './file', 'h264' + fileName)
+          path.join(downloadPath, './', 'h264' + fileName)
         );
 
         deleteFilesAndFolders([
@@ -97,7 +97,7 @@ const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './', retry 
         return finallyPath;
 
       } else {
-        return path.join(downloadPath, './file', result[0]);
+        return path.join(downloadPath, './', result[0]);
       }
     };
 
@@ -161,7 +161,7 @@ const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './', retry 
             throw new Error('响应内容不是视频类型');
           }
 
-          const folderName = path.join(downloadPath, 'file');
+          const folderName = path.join(downloadPath, '.');
           if (!fs.existsSync(folderName)) {
             fs.mkdirSync(folderName, { recursive: true });
           }

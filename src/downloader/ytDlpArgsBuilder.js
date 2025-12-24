@@ -135,7 +135,7 @@ function buildYtDlpArgs({
     const platformMap = FORMAT_MAP[platform] || FORMAT_MAP.generic;
     const formatArgs = platformMap[quality] || [];
     console.log("@@匹配到平台platform", platform)
-    console.log("是否匹配到yd的规则", FORMAT_MAP[platform])
+    console.log("@@匹配到的规则", FORMAT_MAP[platform])
     return [
         ...formatArgs,
         '-o',
