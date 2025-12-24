@@ -13,8 +13,9 @@ function submitTask(task) {
       const strategy = chooseStrategy(task.url);
       console.log("@@taskWorker strategy", strategy)
       const result = await strategy(task);
-      const { path: outputPath, strategyName } = result;
-      console.log("@@queue.add result", result)
+      let { path: outputPath, strategyName } = result;
+      if (typeof result === 'string') outputPath = result;
+      console.log("@@queue.add result", result, typeof result)
       console.log("@@queue.add outputPath", outputPath)
       await updateTask(task.id, {
         status: 'success',
