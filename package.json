@@ -6,7 +6,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dy:cookie": "node ./tools/douyinCookie.js",
     "db:init": "node init_database.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "deploy": "pm2 start index.js --name \"dv-app\""
   },
   "keywords": [],
   "author": "",
