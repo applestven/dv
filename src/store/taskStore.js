@@ -178,19 +178,39 @@ async function getTask(id) {
 async function getAllTasks(status = null, page = 1, limit = 20) {
   const connection = await getConnection();
 
-  let query = 'SELECT * FROM tasks';
+  page = Number(page) || 1;
+  limit = Number(limit) || 20;
+  const offset = (page - 1) * limit;
+
+  let where = '';
   const params = [];
 
-  if (status) {
-    query += ' WHERE status = ?';
+  if (status !== null && status !== undefined) {
+    where = 'WHERE status = ?';
     params.push(status);
   }
 
-  query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-  params.push(limit, (page - 1) * limit);
+  const dataSql = `
+    SELECT
+      id,
+      url,
+      quality,
+      status,
+      location,
+      created_at,
+      started_at,
+      finished_at,
+      strategy,
+      output,
+      output_name
+    FROM tasks
+    ${where}
+    ORDER BY created_at DESC
+    LIMIT ${limit} OFFSET ${offset}
+  `;
 
   try {
-    const [rows] = await connection.execute(query, params);
+    const [rows] = await connection.query(dataSql, params);
 
     return rows.map(dbTask => ({
       id: dbTask.id,
@@ -205,11 +225,13 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
       output: dbTask.output,
       outputName: dbTask.output_name,
     }));
-  } catch (error) {
-    console.error('Error fetching all tasks:', error);
-    throw error;
+  } catch (err) {
+    console.error('Error fetching all tasks:', err);
+    throw err;
   }
 }
+
+
 
 module.exports = {
   initializeTaskTable,

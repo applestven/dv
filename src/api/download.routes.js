@@ -1,6 +1,6 @@
 const express = require('express');
 const { v4: uuid } = require('uuid');
-const { createTask, getTask } = require('../store/taskStore');
+const { createTask, getTask, getAllTasks } = require('../store/taskStore');
 const { submitTask } = require('../queue/taskWorker');
 const { path } = require('path')
 // 尝试加载 .env 文件
@@ -15,6 +15,24 @@ router.get('/', (req, res) => {
   res.json({
     message: 'Hello World',
   });
+});
+
+// 测试连接接口，返回当前正在执行的任务列表
+router.get('/c', async (req, res) => {
+  try {
+    const runningTasks = await getAllTasks('running', 1, 100); // 获取状态为 'running' 的任务，第1页，最多100条
+    res.json({
+      message: 'Connection test successful',
+      runningTasks: runningTasks,
+      total: runningTasks.length
+    });
+  } catch (error) {
+    console.error('Error fetching running tasks:', error);
+    res.status(500).json({
+      message: 'Error fetching running tasks',
+      error: error.message
+    });
+  }
 });
 
 router.post('/download', async (req, res) => {
