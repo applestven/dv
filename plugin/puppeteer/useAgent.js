@@ -87,7 +87,7 @@ async function launchBrowser(options = {}) {
     // executablePath: 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
     timeout: 10800000,
     protocolTimeout: 10800000,
-    headless: debug ? false : true,
+    headless: true,
     ignoreDefaultArgs: ['--enable-automation'],
     args: [
       '--disable-features=site-per-process',
