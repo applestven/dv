@@ -37,6 +37,12 @@ router.get('/c', async (req, res) => {
 
 router.post('/download', async (req, res) => {
   const { url, quality = 'video_bestest' } = req.body;
+  if (!process.env.ZEROTIER_API_URL) {
+
+    return res.status(500).json({
+      message: 'Error: ZEROTIER_API_URL is not set'
+    });
+  }
 
   const task = await createTask({
     id: uuid(),
