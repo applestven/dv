@@ -11,6 +11,12 @@ const { path } = require('path')
 
 const router = express.Router();
 
+router.get('/', (req, res) => {
+  res.json({
+    message: 'Hello World',
+  });
+});
+
 router.post('/download', async (req, res) => {
   const { url, quality = 'video_bestest' } = req.body;
 

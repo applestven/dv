@@ -2,6 +2,7 @@
 require('dotenv').config(); // 在文件开头加载环境变量
 
 const express = require('express');
+const path = require('path');
 const { initConnection, testConnection } = require('./database/mysqlConnection');
 const { initializeTaskTable } = require('./store/taskStore');
 
@@ -9,6 +10,9 @@ const app = express();
 
 // 中间件
 app.use(express.json());
+// 添加静态文件服务，将downloads文件夹提供静态访问 - 使用绝对路径
+const downloadsPath = path.join(__dirname, '../downloads');
+app.use('/downloads', express.static(downloadsPath));
 
 // 初始化数据库连接
 async function initializeDatabase() {
