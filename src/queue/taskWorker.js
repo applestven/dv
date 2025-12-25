@@ -18,7 +18,7 @@ function submitTask(task) {
       console.log("@@queue.add result", result, typeof result)
       console.log("@@queue.add outputPath", outputPath)
       await updateTask(task.id, {
-        status: 'success',
+        status: result.status ? result.status : 'success',
         finishedAt: Date.now(),
         strategy: strategyName ? strategyName : strategy.name, // 有strategyName 说明调用了其他策略 
         ...(outputPath

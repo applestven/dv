@@ -13,6 +13,7 @@ async function initializeTaskTable() {
       quality VARCHAR(50),
       status VARCHAR(20) NOT NULL,
       location VARCHAR(255),
+      error TEXT,
       created_at BIGINT,
       started_at BIGINT,
       finished_at BIGINT,
@@ -46,6 +47,7 @@ async function createTask(task) {
     quality: task.quality || null,
     status: task.status || 'pending',
     location: task.location || null,
+    error: task.error || null,
     createdAt: task.createdAt || Date.now(),
     startedAt: task.startedAt || null,
     finishedAt: task.finishedAt || null,
@@ -61,13 +63,14 @@ async function createTask(task) {
       quality,
       status,
       location,
+      error,
       created_at,
       started_at,
       finished_at,
       strategy,
       output,
       output_name
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   try {
@@ -77,6 +80,7 @@ async function createTask(task) {
       newTask.quality,
       newTask.status,
       newTask.location,
+      newTask.error,
       newTask.createdAt,
       newTask.startedAt,
       newTask.finishedAt,
@@ -161,6 +165,7 @@ async function getTask(id) {
       quality: dbTask.quality,
       status: dbTask.status,
       location: dbTask.location,
+      error: dbTask.error,
       createdAt: dbTask.created_at,
       startedAt: dbTask.started_at,
       finishedAt: dbTask.finished_at,
@@ -197,6 +202,7 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
       quality,
       status,
       location,
+      error,
       created_at,
       started_at,
       finished_at,
@@ -218,6 +224,7 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
       quality: dbTask.quality,
       status: dbTask.status,
       location: dbTask.location,
+      error: dbTask.error,
       createdAt: dbTask.created_at,
       startedAt: dbTask.started_at,
       finishedAt: dbTask.finished_at,

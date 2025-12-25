@@ -12,3 +12,6 @@
 ## 待完成
 
 调研 https://editor.swagger.io/ 能不能直接发起本地请求 将openapi.yaml 直接打开形成链接的形式 不再需要拖动
+
+
+puppeteer 抓流获取到的视频也需要 根据传递类型的不同 来确定是返回视频 还是音频

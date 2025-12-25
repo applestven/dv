@@ -4,11 +4,14 @@ const { execFile } = require('child_process');
 // const ffprobePath = require('ffprobe-static').path
 
 // Get the paths to the packaged versions of the binaries we want to use
-const ffmpegPath = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked');
-const ffprobePath = require('ffprobe-static').path.replace('app.asar', 'app.asar.unpacked');
+// const ffmpegPath = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked');
+// const ffprobePath = require('ffprobe-static').path.replace('app.asar', 'app.asar.unpacked');
 // tell the ffmpeg package where it can find the needed binaries.
 // ffmpeg.setFfmpegPath(ffmpegPath)
 // ffmpeg.setFfprobePath(ffprobePath)
+
+const ffmpegPath = 'ffmpeg'
+const ffprobePath = 'ffprobe'
 
 // 获取ffmpeg版本信息
 function getFFmpegVersion() {
@@ -182,6 +185,57 @@ function reEncodeH264Video(inputFile, outputFile) {
   });
 }
 
+// 提取音频
+// function extractAudio(inputFile) {
+//   return new Promise((resolve, reject) => {
+//     const outputFile = inputFile.replace(/\.[^/.]+$/, '') + '.mp3';
+//     execFile(
+//       ffmpegPath,
+//       ['-i', inputFile, '-vn', '-acodec', 'libmp3lame', '-ab', '128k', outputFile],
+//       {
+//         maxBuffer: 10 * 1024 * 1024,
+//       },
+//       (error) => {
+//         if (error) {
+//           console.log('提取音频失败', error);
+//           reject(error);
+//           return;
+//         }
+//         resolve(outputFile);
+//       }
+//     );
+//   });
+// }
+
+function extractAudio(inputFile) {
+  return new Promise((resolve, reject) => {
+    const outputFile = inputFile.replace(/\.[^/.]+$/, '') + '.mp3';
+
+    const args = [
+      '-y',              // 覆盖输出
+      '-i', inputFile,
+      '-vn',             // 去视频
+      '-map', '0:a:0?',  // 只取第一个音轨（没有也不报错）
+      '-b:a', '128k',    // 新写法
+      outputFile,
+    ];
+
+    execFile(
+      ffmpegPath,
+      args,
+      { maxBuffer: 50 * 1024 * 1024 },
+      (error) => {
+        if (error) {
+          console.error('提取音频失败:', error.message);
+          return reject(error);
+        }
+        resolve(outputFile);
+      }
+    );
+  });
+}
+
+
 module.exports = {
   getFFmpegVersion,
   convertAudio,
@@ -189,4 +243,5 @@ module.exports = {
   getVideoFirstFrame,
   mergeAudioVideo,
   reEncodeH264Video,
+  extractAudio
 };

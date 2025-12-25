@@ -50,7 +50,7 @@ router.post('/download', async (req, res) => {
     quality,
     status: 'pending',
     createdAt: Date.now(),
-    location: process.env.ZEROTIER_API_URL || 'local'
+    location: process.env.ZEROTIER_API_URL
   });
 
   await submitTask(task);
