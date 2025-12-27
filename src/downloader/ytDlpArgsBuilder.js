@@ -133,7 +133,13 @@ function buildYtDlpArgs({
     suffix,
 }) {
     const platformMap = FORMAT_MAP[platform] || FORMAT_MAP.generic;
-    const formatArgs = platformMap[quality] || [];
+    // 兼容 quality 下划线和中横线
+    let formatArgs = platformMap[quality];
+    if (!formatArgs) {
+        // 尝试下划线转中横线
+        const altQuality = quality.includes('_') ? quality.replace(/_/g, '-') : quality.replace(/-/g, '_');
+        formatArgs = platformMap[altQuality] || [];
+    }
     console.log("@@匹配到平台platform", platform)
     console.log("@@匹配到的规则", FORMAT_MAP[platform])
     // 如果是 youtube 平台，自动添加 clash 代理参数

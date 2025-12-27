@@ -37,7 +37,18 @@ router.get('/c', async (req, res) => {
 });
 
 router.post('/download', async (req, res) => {
-  const { url, quality = 'video_bestest' } = req.body;
+  const { url, quality: rawQuality } = req.body;
+  // 允许的quality列表
+  const allowedQualities = [
+    'video_best', 'video_worst', 'audio_best', 'audio_worst',
+    'video-best', 'video-worst', 'audio-best', 'audio-low'
+  ];
+  let quality = rawQuality || 'video_best';
+  // 兼容下划线和中横线
+  quality = quality.replace(/-/g, '_');
+  if (!allowedQualities.includes(quality) && !allowedQualities.includes(quality.replace(/_/g, '-'))) {
+    quality = 'video_best';
+  }
   if (!process.env.ZEROTIER_API_URL) {
 
     return res.status(500).json({
