@@ -136,8 +136,11 @@ function buildYtDlpArgs({
     const formatArgs = platformMap[quality] || [];
     console.log("@@匹配到平台platform", platform)
     console.log("@@匹配到的规则", FORMAT_MAP[platform])
+    // 如果是 youtube 平台，自动添加 clash 代理参数
+    const proxyArgs = platform === 'youtube' ? ['--proxy', 'http://127.0.0.1:7890'] : [];
     return [
         ...formatArgs,
+        ...proxyArgs,
         '-o',
         path.join(outputDir, `%(title)s-${suffix}.%(ext)s`),
         '--no-part',
