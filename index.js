@@ -1,5 +1,6 @@
 const app = require('./src/app');
 
-app.listen(3456, () => {
-    console.log('🚀 server running at http://localhost:3456');
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log(`🚀 server running at http://localhost:${port}`);
 });
