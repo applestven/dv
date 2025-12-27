@@ -1,3 +1,78 @@
+# 部署（Linux / systemd）
+
+本文件描述如何在 Linux（使用 systemd）上使用 pm2 部署并确保服务在重启后自动启动。
+
+前提
+- 在服务器上已经安装 Node.js 与 npm
+- 你将以目标运行用户登录（不要用 root，除非你有特殊需求）
+
+快速步骤
+1. 安装 pm2（如果未安装）：
+
+```bash
+npm install -g pm2
+```
+
+2. 启动应用并保存：
+
+```bash
+npm run deploy
+pm2 save
+```
+
+3. 生成 systemd 启动脚本并注册（记下命令输出并以 sudo 执行生成的命令）：
+
+```bash
+npm run deploy:startup
+# 按照 npm run deploy:startup 的输出，以 sudo 执行生成的命令，例如：
+# sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u deployuser --hp /home/deployuser
+```
+
+4. 再次保存 pm2 列表：
+
+```bash
+pm2 save
+```
+
+5. 验证：
+
+```bash
+pm2 ls
+sudo systemctl status pm2-<user>
+```
+
+6. 重启并确认：
+
+```bash
+sudo reboot
+# 登录后
+pm2 ls
+```
+
+可选：使用仓库提供的 helper 脚本（更方便）
+
+```bash
+# 在项目根目录下
+./bin/pm2-startup.sh <your-username>
+```
+
+脚本会尝试安装 pm2（如果缺失）、运行 `npm run deploy`、`pm2 save` 并打印 `pm2 startup` 输出。请注意脚本假设 home 路径为 `/home/<user>`；如果不同，请以实际路径替换。
+
+排查
+- 如果重启后进程丢失，先检查 pm2 是否已作为 systemd 服务运行：
+
+```bash
+sudo systemctl status pm2-<user>
+journalctl -u pm2-<user> -b
+```
+
+- 检查 pm2 日志：
+
+```bash
+pm2 logs dv-app
+```
+
+- 确认 `pm2 save` 与 `pm2 startup` 是在同一用户下执行的。
 # Linux系统部署文档
 
 ## 1. 系统要求
