@@ -246,4 +246,71 @@ module.exports = {
   updateTask,
   getTask,
   getAllTasks,
+  /**
+   * 多条件查询任务
+   * @param {Object} filters - 筛选条件对象，支持所有字段
+   * @param {number} page - 页码
+   * @param {number} limit - 每页数量
+   * @returns {Promise<Array>} 任务列表
+   */
+  async queryTasks(filters = {}, page = 1, limit = 20) {
+    const connection = await getConnection();
+    page = Number(page) || 1;
+    limit = Number(limit) || 20;
+    const offset = (page - 1) * limit;
+
+    const whereArr = [];
+    const params = [];
+    // 字段映射
+    const fieldMap = {
+      createdAt: 'created_at',
+      startedAt: 'started_at',
+      finishedAt: 'finished_at',
+      outputName: 'output_name',
+    };
+    for (const key in filters) {
+      if (filters[key] !== undefined && filters[key] !== null && filters[key] !== '') {
+        const col = fieldMap[key] || key;
+        if (Array.isArray(filters[key])) {
+          whereArr.push(`${col} IN (${filters[key].map(() => '?').join(',')})`);
+          params.push(...filters[key]);
+        } else if (typeof filters[key] === 'object' && filters[key] !== null) {
+          // 支持范围查询 {createdAt: {min: 1, max: 2}}
+          if (filters[key].min !== undefined) {
+            whereArr.push(`${col} >= ?`);
+            params.push(filters[key].min);
+          }
+          if (filters[key].max !== undefined) {
+            whereArr.push(`${col} <= ?`);
+            params.push(filters[key].max);
+          }
+        } else {
+          whereArr.push(`${col} = ?`);
+          params.push(filters[key]);
+        }
+      }
+    }
+    const where = whereArr.length ? `WHERE ${whereArr.join(' AND ')}` : '';
+    const sql = `SELECT * FROM tasks ${where} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+    try {
+      const [rows] = await connection.query(sql, params);
+      return rows.map(dbTask => ({
+        id: dbTask.id,
+        url: dbTask.url,
+        quality: dbTask.quality,
+        status: dbTask.status,
+        location: dbTask.location,
+        error: dbTask.error,
+        createdAt: dbTask.created_at,
+        startedAt: dbTask.started_at,
+        finishedAt: dbTask.finished_at,
+        strategy: dbTask.strategy,
+        output: dbTask.output,
+        outputName: dbTask.output_name,
+      }));
+    } catch (err) {
+      console.error('Error querying tasks:', err);
+      throw err;
+    }
+  },
 };

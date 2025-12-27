@@ -10,6 +10,45 @@ servers:
     description: 本地开发服务器
 
 paths:
+  /tasks/query:
+    post:
+      summary: 多条件查询任务
+      description: 根据多种条件筛选任务，支持所有字段的精确、范围、数组（in）查询，支持分页
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filters:
+                  $ref: '#/components/schemas/TaskQueryFilters'
+                page:
+                  type: integer
+                  description: 页码，从1开始
+                  default: 1
+                limit:
+                  type: integer
+                  description: 每页数量
+                  default: 20
+      responses:
+        "200":
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  message:
+                    type: string
+                    example: success
   /:
     get:
       summary: 获取欢迎信息
@@ -182,3 +221,73 @@ components:
           type: string
           description: 错误信息（如果有）
           example: "Some error message"
+    TaskQueryFilters:
+      type: object
+      properties:
+        id:
+          type: string
+          description: 任务ID，精确匹配
+        url:
+          type: string
+          description: 视频URL，精确匹配
+        quality:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: 视频质量，支持单值或数组（in 查询）
+        status:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: 任务状态，支持单值或数组
+        location:
+          type: string
+          description: 任务执行位置
+        error:
+          type: string
+          description: 错误信息
+        createdAt:
+          oneOf:
+            - type: integer
+            - type: object
+              properties:
+                min:
+                  type: integer
+                  description: 最小创建时间戳
+                max:
+                  type: integer
+                  description: 最大创建时间戳
+          description: 创建时间戳，支持范围
+        startedAt:
+          oneOf:
+            - type: integer
+            - type: object
+              properties:
+                min:
+                  type: integer
+                max:
+                  type: integer
+          description: 开始时间戳，支持范围
+        finishedAt:
+          oneOf:
+            - type: integer
+            - type: object
+              properties:
+                min:
+                  type: integer
+                max:
+                  type: integer
+          description: 完成时间戳，支持范围
+        strategy:
+          type: string
+          description: 策略
+        output:
+          type: string
+          description: 输出路径
+        outputName:
+          type: string
+          description: 输出文件名

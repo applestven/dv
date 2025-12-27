@@ -1,6 +1,7 @@
 const express = require('express');
 const { v4: uuid } = require('uuid');
-const { createTask, getTask, getAllTasks } = require('../store/taskStore');
+const { createTask, getTask, getAllTasks, queryTasks } = require('../store/taskStore');
+
 const { submitTask } = require('../queue/taskWorker');
 const { path } = require('path')
 // 尝试加载 .env 文件
@@ -61,6 +62,30 @@ router.post('/download', async (req, res) => {
 router.get('/task/:id', async (req, res) => {
   const task = await getTask(req.params.id);
   res.json(task);
+});
+
+
+// 多条件查询任务接口
+router.post('/tasks/query', async (req, res) => {
+  /**
+   * 支持 body 传递 filters, page, limit
+   * filters: { id, url, quality, status, location, error, createdAt, startedAt, finishedAt, strategy, output, outputName }
+   * 字段可为单值、数组（in）、或范围对象（如 {min, max}）
+   */
+  try {
+    const { filters = {}, page = 1, limit = 20 } = req.body || {};
+    const tasks = await queryTasks(filters, page, limit);
+    res.json({
+      code: 0,
+      data: tasks,
+      message: 'success',
+    });
+  } catch (err) {
+    res.status(500).json({
+      code: 1,
+      message: err.message,
+    });
+  }
 });
 
 module.exports = router;

@@ -4,14 +4,15 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "node index.js",
     "dy:cookie": "node ./tools/douyinCookie.js",
     "db:init": "node init_database.js",
-  "start": "node index.js",
-  "deploy": "pm2 start index.js --name \"dv-app\" --update-env",
-  "deploy:re": "pm2 restart dv-app",
-  "deploy:save": "pm2 save",
-  "deploy:startup": "pm2 startup -u $USERNAME --hp $HOME || pm2 startup",
-  "deploy:full": "npm run deploy && npm run deploy:save && npm run deploy:startup"
+    "start": "node index.js",
+    "deploy": "pm2 start index.js --name \"dv-app\" --update-env",
+    "deploy:re": "pm2 restart dv-app",
+    "deploy:save": "pm2 save",
+    "deploy:startup": "pm2 startup -u $USERNAME --hp $HOME || pm2 startup",
+    "deploy:full": "npm run deploy && npm run deploy:save && npm run deploy:startup"
   },
   "keywords": [],
   "author": "",
