@@ -240,6 +240,8 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
 
 
 
+const { scheduleClear } = require('./clearOldTasks');
+
 module.exports = {
   initializeTaskTable,
   createTask,
@@ -314,3 +316,6 @@ module.exports = {
     }
   },
 };
+
+// 启动定时清理任务
+scheduleClear();
