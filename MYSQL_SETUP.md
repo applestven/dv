@@ -86,7 +86,7 @@ node init_database.js
 
 ## 任务表结构
 
-系统会自动创建 `tasks` 表，包含以下字段：
+系统会自动创建 `dvtasks` 表，包含以下字段：
 
 - `id`: 任务唯一标识符 (VARCHAR 36)
 - `url`: 下载链接 (TEXT)

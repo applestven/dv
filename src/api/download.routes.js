@@ -74,7 +74,7 @@ router.get('/task/:id', async (req, res) => {
   const task = await getTask(req.params.id);
   if (!task) return res.status(404).json({ message: 'Task not found' });
   // 拼接总路径
-  const port = process.env.PORT || 3000;
+  const port = process.env.PORT || 3456;
   let baseUrl = task.location + (port == 80 || port == 443 ? '' : ':' + port);
   let fullPath = task.output ? (baseUrl + '/downloads/' + task.outputName) : null;
   res.json({
@@ -95,7 +95,7 @@ router.post('/tasks/query', async (req, res) => {
     const { filters = {}, page = 1, limit = 20 } = req.body || {};
     const tasks = await queryTasks(filters, page, limit);
     // 为每个任务添加fullPath字段
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 3456;
     let baseUrl = req.protocol + '://' + req.hostname + (port == 80 || port == 443 ? '' : ':' + port);
     const tasksWithFullPath = tasks.map(task => ({
       ...task,
