@@ -7,7 +7,7 @@ async function initializeTaskTable() {
   const connection = await getConnection();
 
   const createTableQuery = `
-    CREATE TABLE IF NOT EXISTS tasks (
+    CREATE TABLE IF NOT EXISTS dvtasks (
       id VARCHAR(36) PRIMARY KEY,
       url TEXT NOT NULL,
       quality VARCHAR(50),
@@ -27,9 +27,9 @@ async function initializeTaskTable() {
 
   try {
     await connection.execute(createTableQuery);
-    console.log('Tasks table created or already exists');
+    console.log('Dvtasks table created or already exists');
   } catch (error) {
-    console.error('Error creating tasks table:', error);
+    console.error('Error creating dvtasks table:', error);
     throw error;
   }
 }
@@ -57,7 +57,7 @@ async function createTask(task) {
   };
 
   const query = `
-    INSERT INTO tasks (
+    INSERT INTO dvtasks (
       id,
       url,
       quality,
@@ -130,7 +130,7 @@ async function updateTask(id, patch) {
 
   if (!fields.length) return { id };
 
-  const query = `UPDATE tasks SET ${fields.join(', ')} WHERE id = ?`;
+  const query = `UPDATE dvtasks SET ${fields.join(', ')} WHERE id = ?`;
   values.push(id);
 
   try {
@@ -150,7 +150,7 @@ async function updateTask(id, patch) {
 async function getTask(id) {
   const connection = await getConnection();
 
-  const query = 'SELECT * FROM tasks WHERE id = ?';
+  const query = 'SELECT * FROM dvtasks WHERE id = ?';
 
   try {
     const [rows] = await connection.execute(query, [id]);
@@ -209,7 +209,7 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
       strategy,
       output,
       output_name
-    FROM tasks
+    FROM dvtasks
     ${where}
     ORDER BY created_at DESC
     LIMIT ${limit} OFFSET ${offset}
@@ -293,7 +293,7 @@ module.exports = {
       }
     }
     const where = whereArr.length ? `WHERE ${whereArr.join(' AND ')}` : '';
-    const sql = `SELECT * FROM tasks ${where} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+    const sql = `SELECT * FROM dvtasks ${where} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
     try {
       const [rows] = await connection.query(sql, params);
       return rows.map(dbTask => ({
