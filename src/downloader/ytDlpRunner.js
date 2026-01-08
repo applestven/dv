@@ -30,7 +30,8 @@ function resolveFormatByQuality(quality) {
 }
 
 function isAudioMode(quality) {
-    return quality.startsWith('audio_');
+    // 支持下划线和中横线两种命名：audio_worst / audio-worst
+    return quality.startsWith('audio_') || quality.startsWith('audio-');
 }
 
 // function runYtDlp({
@@ -183,22 +184,18 @@ function runYtDlp({
 
         const ytDlpArgs = buildYtDlpArgs({
             platform,
-            quality: quality.replace('_', '-'),
+            quality: quality.replace(/_/g, '-'),
             outputDir,
             suffix: quality,
         });
 
+        // 先把所有选项拼好，URL 必须放在最后
         const args = [
-            url,
             ...ytDlpArgs,
             '--no-playlist',
         ];
 
-        if (!isAudioMode(quality)) {
-            args.push('--merge-output-format', 'mp4');
-        }
-
-        // ⭐ 注入 cookie
+        // ⭐ 注入 cookie（必须在 URL 之前）
         if (autoCookie) {
             args.push('--cookies', autoCookie);
             console.log(`[yt-dlp] using cookie: ${autoCookie}`);
@@ -208,9 +205,22 @@ function runYtDlp({
             args.push('--user-agent', userAgent);
         }
 
-        args.push(...extraArgs);
+        // 如果不是音频模式，确保在 URL 之前加入 merge 输出格式
+        if (!isAudioMode(quality)) {
+            args.push('--merge-output-format', 'mp4');
+        }
 
+        // 用户自定义额外参数也要在 URL 之前
+        if (extraArgs && extraArgs.length) {
+            args.push(...extraArgs);
+        }
+
+        // 最后把 URL 放到参数末尾
+        args.push(url);
+
+        // 打印完整参数数组，方便调试（可复制到终端直接运行）
         console.log('[yt-dlp]', ytDlpBin, args.join(' '));
+        console.log('[yt-dlp args array]', JSON.stringify(args));
 
         return new Promise((resolve, reject) => {
             const proc = spawn(ytDlpBin, args, {

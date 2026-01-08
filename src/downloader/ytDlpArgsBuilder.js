@@ -132,16 +132,31 @@ function buildYtDlpArgs({
     outputDir,
     suffix,
 }) {
+    // 统一把下划线转成中横线
+    let q = quality.replace(/_/g, '-');
+
+    // 别名映射：把用户可能传的 audio_worst / audio-worst 映射到我们在 FORMAT_MAP 中定义的 audio-low
+    const ALIAS_MAP = {
+        'audio-worst': 'audio-low',
+        'audio_low': 'audio-low',
+        'audio-low': 'audio-low',
+        'audio-best': 'audio-best',
+        'video-worst': 'video-worst',
+        'video-best': 'video-best',
+    };
+
+    const normalizedQuality = ALIAS_MAP[q] || q;
+
+    console.log('@@quality debug', { original: quality, normalizedToken: q, normalizedQuality });
+
     const platformMap = FORMAT_MAP[platform] || FORMAT_MAP.generic;
-    // 兼容 quality 下划线和中横线
-    let formatArgs = platformMap[quality];
+    let formatArgs = platformMap[normalizedQuality];
     if (!formatArgs) {
-        // 尝试下划线转中横线
-        const altQuality = quality.includes('_') ? quality.replace(/_/g, '-') : quality.replace(/-/g, '_');
+        // 兼容原来的下划线/中横线处理（作为兜底）
+        const altQuality = q.includes('-') ? q.replace(/-/g, '_') : q.replace(/_/g, '-');
         formatArgs = platformMap[altQuality] || [];
     }
-    console.log("@@匹配到平台platform", platform)
-    console.log("@@匹配到的规则", FORMAT_MAP[platform])
+    console.log('@@formatArgs', formatArgs);
     // 如果是 youtube 平台，自动添加 clash 代理参数
     const proxyArgs = platform === 'youtube' ? ['--proxy', 'http://127.0.0.1:7890'] : [];
     return [
