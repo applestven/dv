@@ -84,6 +84,14 @@ npm run db:init
 node init_database.js
 ```
 
+## 数据库迁移
+
+如果已有数据库表结构，需要添加新的size字段，请运行：
+
+```bash
+node migrate_size_field.js
+```
+
 ## 任务表结构
 
 系统会自动创建 `dvtasks` 表，包含以下字段：
@@ -92,12 +100,15 @@ node init_database.js
 - `url`: 下载链接 (TEXT)
 - `quality`: 视频质量 (VARCHAR 50)
 - `status`: 任务状态 (VARCHAR 20)
+- `location`: 存储位置 (VARCHAR 255)
+- `error`: 错误信息 (TEXT)
 - `created_at`: 创建时间 (BIGINT)
 - `started_at`: 开始时间 (BIGINT)
 - `finished_at`: 完成时间 (BIGINT)
 - `strategy`: 使用的策略 (VARCHAR 50)
 - `output`: 输出路径 (VARCHAR 500)
 - `output_name`: 输出文件名 (VARCHAR 255)
+- `size`: 文件大小 (BIGINT)
 - `created`: 记录创建时间 (TIMESTAMP)
 - `updated`: 记录更新时间 (TIMESTAMP)
 
