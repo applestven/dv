@@ -242,18 +242,49 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
 
 const { scheduleClear } = require('./clearOldTasks');
 
+// 添加统计任务数量的函数
+async function getTaskStats() {
+  const connection = await getConnection();
+
+  // 查询所有任务总数
+  const totalQuery = 'SELECT COUNT(*) as totalCount FROM dvtasks';
+  // 查询正在下载的任务数量 (status 为 'running' 或 'pending')
+  const downloadingQuery = "SELECT COUNT(*) as downloadingCount FROM dvtasks WHERE status IN ('running', 'pending')";
+  // 查询下载失败的任务数量 (status 为 'failed')
+  const failedQuery = "SELECT COUNT(*) as failedCount FROM dvtasks WHERE status = 'failed'";
+
+  try {
+    // 并行执行查询
+    const [[totalResult], [downloadingResult], [failedResult]] = await Promise.all([
+      connection.execute(totalQuery),
+      connection.execute(downloadingQuery),
+      connection.execute(failedQuery)
+    ]);
+
+    return {
+      total: totalResult[0].totalCount || 0,
+      downloading: downloadingResult[0].downloadingCount || 0,
+      failed: failedResult[0].failedCount || 0
+    };
+  } catch (error) {
+    console.error('Error fetching task statistics:', error);
+    throw error;
+  }
+}
+
 module.exports = {
   initializeTaskTable,
   createTask,
   updateTask,
   getTask,
   getAllTasks,
+  getTaskStats, // 导出新添加的统计函数
   /**
    * 多条件查询任务
    * @param {Object} filters - 筛选条件对象，支持所有字段
    * @param {number} page - 页码
    * @param {number} limit - 每页数量
-   * @returns {Promise<Array>} 任务列表
+   * @returns {Promise<Object>} 包含任务列表和分页信息的对象
    */
   async queryTasks(filters = {}, page = 1, limit = 20) {
     const connection = await getConnection();
@@ -293,10 +324,22 @@ module.exports = {
       }
     }
     const where = whereArr.length ? `WHERE ${whereArr.join(' AND ')}` : '';
-    const sql = `SELECT * FROM dvtasks ${where} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+    
+    // 执行两个查询：总数和当前页数据
+    const countSql = `SELECT COUNT(*) as total FROM dvtasks ${where}`;
+    const dataSql = `SELECT * FROM dvtasks ${where} ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
+    
     try {
-      const [rows] = await connection.query(sql, params);
-      return rows.map(dbTask => ({
+      // 并行执行查询
+      const [[countResult], [dataRows]] = await Promise.all([
+        connection.query(countSql, params),
+        connection.query(dataSql, params)
+      ]);
+      
+      const total = countResult[0].total;
+      const totalPages = Math.ceil(total / limit);
+      
+      const tasks = dataRows.map(dbTask => ({
         id: dbTask.id,
         url: dbTask.url,
         quality: dbTask.quality,
@@ -310,6 +353,16 @@ module.exports = {
         output: dbTask.output,
         outputName: dbTask.output_name,
       }));
+      
+      return {
+        tasks,
+        pagination: {
+          page,
+          pageSize: limit,
+          total,
+          totalPages
+        }
+      };
     } catch (err) {
       console.error('Error querying tasks:', err);
       throw err;

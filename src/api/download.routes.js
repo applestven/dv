@@ -1,6 +1,6 @@
 const express = require('express');
 const { v4: uuid } = require('uuid');
-const { createTask, getTask, getAllTasks, queryTasks } = require('../store/taskStore');
+const { createTask, getTask, getAllTasks, queryTasks, getTaskStats } = require('../store/taskStore');
 
 const { submitTask } = require('../queue/taskWorker');
 const { path } = require('path')
@@ -93,7 +93,9 @@ router.post('/tasks/query', async (req, res) => {
    */
   try {
     const { filters = {}, page = 1, limit = 20 } = req.body || {};
-    const tasks = await queryTasks(filters, page, limit);
+    const result = await queryTasks(filters, page, limit);
+    const { tasks, pagination } = result;
+    
     // 为每个任务添加fullPath字段
     const port = process.env.PORT || 3456;
     let baseUrl = req.protocol + '://' + req.hostname + (port == 80 || port == 443 ? '' : ':' + port);
@@ -101,15 +103,35 @@ router.post('/tasks/query', async (req, res) => {
       ...task,
       fullPath: task.output ? (baseUrl + '/downloads/' + encodeURIComponent(task.output)) : null
     }));
+    
     res.json({
       code: 0,
       data: tasksWithFullPath,
+      pagination: pagination,
       message: 'success',
     });
   } catch (err) {
     res.status(500).json({
       code: 1,
       message: err.message,
+    });
+  }
+});
+
+// 获取任务统计信息接口
+router.get('/stats', async (req, res) => {
+  try {
+    const stats = await getTaskStats();
+    
+    res.json({
+      code: 0,
+      data: stats,  // 直接返回统计结果
+      message: 'success'
+    });
+  } catch (error) {
+    res.status(500).json({
+      code: 1,
+      message: error.message
     });
   }
 });

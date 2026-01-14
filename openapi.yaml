@@ -10,45 +10,6 @@ servers:
     description: 本地开发服务器
 
 paths:
-  /tasks/query:
-    post:
-      summary: 多条件查询任务
-      description: 根据多种条件筛选任务，支持所有字段的精确、范围、数组（in）查询，支持分页
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                filters:
-                  $ref: '#/components/schemas/TaskQueryFilters'
-                page:
-                  type: integer
-                  description: 页码，从1开始
-                  default: 1
-                limit:
-                  type: integer
-                  description: 每页数量
-                  default: 20
-      responses:
-        "200":
-          description: 查询成功
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 0
-                  data:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Task'
-                  message:
-                    type: string
-                    example: success
   /:
     get:
       summary: 获取欢迎信息
@@ -167,6 +128,103 @@ paths:
         "404":
           description: 文件不存在
 
+  /stats:
+    get:
+      summary: 获取任务统计信息
+      description: 获取下载任务的统计信息，包括总任务数、正在下载数和失败数
+      responses:
+        "200":
+          description: 任务统计信息
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    description: 状态码，0表示成功
+                    example: 0
+                  data:
+                    type: object
+                    description: 统计数据
+                    properties:
+                      total:
+                        type: integer
+                        description: 任务总量
+                        example: 100
+                      downloading:
+                        type: integer
+                        description: 正在下载数量（包括pending和running状态）
+                        example: 5
+                      failed:
+                        type: integer
+                        description: 下载失败数量
+                        example: 3
+                  message:
+                    type: string
+                    description: 响应消息
+                    example: "success"
+
+
+  /tasks/query:
+    post:
+      summary: 多条件查询任务
+      description: 根据多种条件筛选任务，支持所有字段的精确、范围、数组（in）查询，支持分页
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filters:
+                  $ref: '#/components/schemas/TaskQueryFilters'
+                page:
+                  type: integer
+                  description: 页码，从1开始
+                  default: 1
+                limit:
+                  type: integer
+                  description: 每页数量
+                  default: 20
+      responses:
+        "200":
+          description: 查询成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 0
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Task'
+                  pagination:
+                    type: object
+                    description: 分页信息
+                    properties:
+                      page:
+                        type: integer
+                        description: 当前页码
+                        example: 1
+                      pageSize:
+                        type: integer
+                        description: 每页大小
+                        example: 10
+                      total:
+                        type: integer
+                        description: 总记录数
+                        example: 12
+                      totalPages:
+                        type: integer
+                        description: 总页数
+                        example: 2
+                  message:
+                    type: string
+                    example: success
 components:
   schemas:
     Task:
