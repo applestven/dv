@@ -20,6 +20,7 @@ async function initializeTaskTable() {
       strategy VARCHAR(50),
       output VARCHAR(500),
       output_name VARCHAR(255),
+      size BIGINT,
       created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -54,6 +55,7 @@ async function createTask(task) {
     strategy: task.strategy || null,
     output: task.output || null,
     outputName: task.outputName || null,
+    size: task.size || null,
   };
 
   const query = `
@@ -69,8 +71,9 @@ async function createTask(task) {
       finished_at,
       strategy,
       output,
-      output_name
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      output_name,
+      size
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   try {
@@ -87,6 +90,7 @@ async function createTask(task) {
       newTask.strategy,
       newTask.output,
       newTask.outputName,
+      newTask.size,
     ]);
 
     return newTask;
@@ -118,6 +122,9 @@ async function updateTask(id, patch) {
         break;
       case 'outputName':
         columnName = 'output_name';
+        break;
+      case 'size':
+        columnName = 'size';
         break;
       default:
         columnName = key; // 包含 location
@@ -172,6 +179,7 @@ async function getTask(id) {
       strategy: dbTask.strategy,
       output: dbTask.output,
       outputName: dbTask.output_name,
+      size: dbTask.size,
     };
   } catch (error) {
     console.error('Error fetching task:', error);
@@ -208,7 +216,8 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
       finished_at,
       strategy,
       output,
-      output_name
+      output_name,
+      size
     FROM dvtasks
     ${where}
     ORDER BY created_at DESC
@@ -231,14 +240,13 @@ async function getAllTasks(status = null, page = 1, limit = 20) {
       strategy: dbTask.strategy,
       output: dbTask.output,
       outputName: dbTask.output_name,
+      size: dbTask.size,
     }));
   } catch (err) {
     console.error('Error fetching all tasks:', err);
     throw err;
   }
 }
-
-
 
 const { scheduleClear } = require('./clearOldTasks');
 
@@ -352,6 +360,7 @@ module.exports = {
         strategy: dbTask.strategy,
         output: dbTask.output,
         outputName: dbTask.output_name,
+        size: dbTask.size,
       }));
       
       return {
