@@ -4,8 +4,11 @@ const puppeteerStrategy = require('./puppeteer.strategy');
 
 module.exports = async function ytDlpStrategy(task) {
     try {
+
+        const regex = /(http|https):\/\/[^\s]+/;
+        const match = task.url.match(regex);
         return await runYtDlp({
-            url: task.url,
+            url: match,
             quality: task.quality,
             id: task.id,
             name: 'ytDlpStrategy'

@@ -1,7 +1,7 @@
 #!/bin/bash
 ssh apple@192.168.191.168
 
-# cd /home/apple/code/dv
+# cd /home/apple/code/dv && git reset --hard && git pull && npm run deploy:re
 
 
 
