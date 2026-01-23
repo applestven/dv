@@ -75,9 +75,9 @@ const _downloadVideoCommonCore = async ({ sourceUrl, downloadPath = './', retry 
         // downloadLog.info('正在进行文件音视频合并');
         let fileName = `${new Date().toISOString().replace(/:/g, '-')}.mp4`;
         const outPath = await mergeAudioVideo(
-          path.join(downloadPath, './file', result[0]),
-          path.join(downloadPath, './file', result[1]),
-          path.join(downloadPath, './file', fileName)
+          path.join(downloadPath, result[0]),
+          path.join(downloadPath, result[1]),
+          path.join(downloadPath, fileName)
         );
 
         console.log('正在进行转码 h264');
