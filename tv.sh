@@ -1,7 +1,7 @@
 #!/bin/bash
-ssh apple@192.168.191.168
+ssh apple@192.168.190.168
 
-# cd /home/apple/code/dv && git reset --hard && git pull && npm run deploy:re
+ # cd /home/apple/code/dv && git reset --hard && git pull && npm run deploy:re
 
 
 
@@ -16,4 +16,4 @@ ssh apple@192.168.191.168
 ## 日志
 ## cd /home/apple/code/tv/logs
 ## npx serve . -l 8088
-##  192.168.191.168:8088
+##  192.168.190.168:8088
